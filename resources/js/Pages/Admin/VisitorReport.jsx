@@ -47,7 +47,7 @@ export default function VisitorReport({ visits, summary, selectedDate }) {
                             value={date}
                             onChange={handleDateChange}
                         />
-                        <button className="btn btn-success" onClick={handleDownload}>
+                        <button className="btn btn-success btn-sm" onClick={handleDownload}>
                             ⬇️ Download CSV
                         </button>
                     </div>

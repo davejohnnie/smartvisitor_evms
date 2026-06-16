@@ -554,3 +554,15 @@
     color: #718096;
     font-style: italic;
 }
+
+/* ── Chart size constraint ───────────────────────── */
+.charts-grid .page-card {
+    position: relative;
+    height: 320px;
+    display: flex;
+    flex-direction: column;
+}
+
+.charts-grid canvas {
+    max-height: 240px !important;
+}

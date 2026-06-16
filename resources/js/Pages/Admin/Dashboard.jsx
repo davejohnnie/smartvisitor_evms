@@ -92,6 +92,7 @@ export default function Dashboard({
 
     const pieOptions = {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             legend: { position: "bottom" },
         },
@@ -99,6 +100,7 @@ export default function Dashboard({
 
     const chartOptions = {
         responsive: true,
+        maintainAspectRatio: false,
         plugins: {
             legend: { display: false },
         },
