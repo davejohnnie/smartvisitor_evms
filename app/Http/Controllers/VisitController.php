@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Visit;
 use App\Models\Visitor;
+use App\Services\SmsService;
 use Carbon\Carbon;
 
 class VisitController extends Controller
@@ -121,7 +122,9 @@ class VisitController extends Controller
 
     public function checkIn(Request $request, $id)
     {
-        $guard = auth()->user()->securityGuard;
+        /** @var \App\Models\User $user */
+        $user  = auth()->user();
+        $guard = $user->securityGuard;
 
         $visit = Visit::with(['visitor', 'tenant.user'])
             ->where('visit_id', $id)
@@ -138,6 +141,18 @@ class VisitController extends Controller
             'check_in' => now(),
             'guard_id' => $guard->guard_id,
         ]);
+
+        // SMS notification to tenant
+        $tenantPhone = $visit->tenant?->phone_number;
+        $visitorName = $visit->visitor?->full_name;
+        $timeIn      = Carbon::now()->format('h:i A');
+        $unit        = $visit->tenant?->unit_number;
+
+        if ($tenantPhone) {
+            $sms     = new SmsService();
+            $message = "SmartVisitor: {$visitorName} has arrived at the gate and checked in at {$timeIn}. Unit {$unit}.";
+            $sms->send($tenantPhone, $message);
+        }
 
         return response()->json([
             'message' => 'Visitor checked in successfully.',

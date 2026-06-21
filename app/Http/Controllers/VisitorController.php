@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use App\Models\Visit;
 use App\Models\Visitor;
 use App\Models\Tenant;
+use App\Services\SmsService;
 use Carbon\Carbon;
 
 class VisitorController extends Controller
@@ -61,8 +62,18 @@ class VisitorController extends Controller
             'check_in'          => $now,
         ]);
 
-        // SMS notification hook — will be filled in Section 8
-        // NotificationService::notifyTenantWalkIn($visit);
+
+        // SMS notification to tenant
+        $tenantPhone = $visit->tenant?->phone_number;
+        $visitorName = $visitor->full_name;
+        $timeIn      = Carbon::now()->format('h:i A');
+        $unit        = $visit->tenant?->unit_number;
+
+        if ($tenantPhone) {
+            $sms     = new SmsService();
+            $message = "SmartVisitor: {$visitorName} has walked in and checked in at {$timeIn}. Unit {$unit}.";
+            $sms->send($tenantPhone, $message);
+        }
 
         return redirect()->route('guard.visitors')
             ->with('success', "Walk-in visitor {$visitor->full_name} has been checked in.");
