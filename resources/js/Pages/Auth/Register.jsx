@@ -48,9 +48,9 @@ export default function Register() {
 
             <div className="auth-form-side">
                 <div className="auth-form-box">
-                    <Link href="/" className="auth-back-home">
+                    <a href="/" className="auth-back-home">
                         ← Back to home
-                    </Link>
+                    </a>
 
                     <h1>Register as a Tenant</h1>
                     <p className="auth-sub">

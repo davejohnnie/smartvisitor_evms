@@ -44,9 +44,9 @@ export default function Login({ status, canResetPassword }) {
 
             <div className="auth-form-side">
                 <div className="auth-form-box">
-                    <Link href="/" className="auth-back-home">
+                    <a href="/" className="auth-back-home">
                         ← Back to home
-                    </Link>
+                    </a>
 
                     <h1>Welcome back</h1>
                     <p className="auth-sub">
