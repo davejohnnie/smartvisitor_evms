@@ -1,0 +1,160 @@
+/* ── Guard Sidebar ───────────────────────────────── */
+.guard-sidebar {
+    background: #1a3a2a;
+}
+
+.guard-sidebar .sv-brand {
+    border-bottom-color: #2e5a3a;
+}
+
+.guard-sidebar .sv-nav-link:hover,
+.guard-sidebar .sv-nav-link.active {
+    background: #2e5a3a;
+}
+
+.guard-sidebar .sv-sidebar-footer {
+    border-top-color: #2e5a3a;
+}
+
+/* ── Visit Result Card ───────────────────────────── */
+.visit-result-card {
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 24px;
+    margin-top: 16px;
+}
+
+.visit-result-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.visit-result-header h5 {
+    margin: 0;
+    font-weight: 700;
+    color: #1e2a3a;
+}
+
+.visit-result-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 24px;
+}
+
+.visit-result-section { display: flex; flex-direction: column; gap: 10px; }
+
+.section-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #718096;
+    margin-bottom: 4px;
+}
+
+.result-item { display: flex; flex-direction: column; gap: 2px; }
+.result-label { font-size: 0.75rem; color: #a0aec0; text-transform: uppercase; letter-spacing: 0.4px; }
+.result-value { font-size: 0.95rem; color: #1e2a3a; font-weight: 500; }
+
+/* ── QR Scanner Window ───────────────────────────── */
+#qr-reader {
+    width: 100% !important;
+    max-width: 500px;
+    border: 3px solid #48bb78;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+    position: relative;
+}
+
+#qr-reader video {
+    width: 100% !important;
+    border-radius: 10px;
+}
+
+#qr-reader__scan_region {
+    background: transparent !important;
+    position: relative;
+}
+
+/* The targeting corners */
+#qr-reader__scan_region::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 220px;
+    height: 220px;
+    border: 3px solid #48bb78;
+    border-radius: 8px;
+    box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.45);
+    z-index: 10;
+}
+
+/* Scanning animation line */
+#qr-reader__scan_region::after {
+    content: '';
+    position: absolute;
+    top: calc(50% - 110px);
+    left: calc(50% - 110px);
+    width: 220px;
+    height: 3px;
+    background: #48bb78;
+    animation: scanLine 2s linear infinite;
+    z-index: 11;
+}
+
+@keyframes scanLine {
+    0%   { transform: translateY(0); opacity: 1; }
+    50%  { transform: translateY(217px); opacity: 1; }
+    51%  { opacity: 0; }
+    100% { transform: translateY(0); opacity: 0; }
+}
+
+/* Hide the default html5-qrcode UI clutter */
+#qr-reader__dashboard {
+    display: none !important;
+}
+
+#qr-reader__header_message {
+    display: none !important;
+}
+
+/* ── Scanner Wrapper ─────────────────────────────── */
+.scanner-wrapper {
+    margin-bottom: 20px;
+}
+
+.scanner-hint {
+    font-size: 0.88rem;
+    color: #4a5568;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.scanner-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 500px;
+    height: 260px;
+    background: #f7fafc;
+    border: 2px dashed #cbd5e0;
+    border-radius: 12px;
+    color: #a0aec0;
+    text-align: center;
+    margin-bottom: 20px;
+    gap: 12px;
+}
+
+.scanner-placeholder-icon {
+    font-size: 3rem;
+}

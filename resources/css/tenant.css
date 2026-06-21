@@ -1,0 +1,12 @@
+/* ── QR Code ─────────────────────────────────────── */
+.qr-container {
+    margin-top: 32px;
+    padding: 24px;
+    background: #f7fafc;
+    border-radius: 10px;
+    text-align: center;
+    border: 2px dashed #cbd5e0;
+}
+
+.qr-container h5 { margin-bottom: 8px; font-weight: 700; }
+.qr-token-text { font-size: 0.75rem; color: #718096; margin-top: 12px; word-break: break-all; }

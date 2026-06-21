@@ -1,4 +1,8 @@
 @import './smartvisitor.css';
+@import './tenant.css';
+@import './guard.css';
+@import './admin.css';
+@import './auth.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
