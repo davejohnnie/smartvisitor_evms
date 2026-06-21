@@ -148,4 +148,22 @@ class AdminController extends Controller
         return redirect()->route('admin.register-guard')
             ->with('success', "Guard {$request->name} has been registered successfully.");
     }
+
+    public function guardList()
+    {
+        $guards = Guard::with('user')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $summary = [
+            'total'    => $guards->count(),
+            'on_duty'  => $guards->where('status', 'on-duty')->count(),
+            'off_duty' => $guards->where('status', 'off-duty')->count(),
+        ];
+
+        return Inertia::render('Admin/Guards', [
+            'guards'  => $guards,
+            'summary' => $summary,
+        ]);
+    }
 }

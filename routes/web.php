@@ -56,6 +56,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/register-guard',   [AdminController::class, 'registerGuard'])  ->name('register-guard');
     Route::get('/reports',          [AdminController::class, 'visitorReport'])  ->name('reports');
     Route::get('/incidents',        [AdminController::class, 'incidents'])      ->name('incidents');
+    Route::get('/guards', [AdminController::class, 'guardList'])->name('guards.index');
 
     // Actions
     Route::post('/guards',                      [AdminController::class, 'storeGuard'])         ->name('guards.store');
