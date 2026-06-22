@@ -8,7 +8,6 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Inertia\Inertia;
@@ -16,13 +15,11 @@ use Inertia\Response;
 
 class RegisteredUserController extends Controller
 {
-    // Show registration form
     public function create(): Response
     {
         return Inertia::render('Auth/Register');
     }
 
-    // Handle registration form submission
     public function store(Request $request): RedirectResponse
     {
         $request->validate([
@@ -34,15 +31,14 @@ class RegisteredUserController extends Controller
             'block'        => 'required|string|max:5',
         ]);
 
-        // Create the user with tenant role
         $user = User::create([
             'name'     => $request->name,
             'email'    => $request->email,
             'password' => Hash::make($request->password),
             'role'     => 'tenant',
+            'status'   => 'pending',
         ]);
 
-        // Create the linked tenant profile
         Tenant::create([
             'u_id'         => $user->u_id,
             'phone_number' => $request->phone_number,
@@ -53,8 +49,10 @@ class RegisteredUserController extends Controller
 
         event(new Registered($user));
 
-        Auth::login($user);
+        // Do NOT call Auth::login() here — tenant is pending, not approved yet
+        // They should not get a session until admin approves them
 
-        return redirect()->route('tenant.dashboard');
+        return redirect()->route('registration.pending')
+            ->with('success', 'Registration submitted. You will be notified via SMS once your account is approved.');
     }
 }

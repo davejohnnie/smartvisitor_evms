@@ -1,5 +1,5 @@
 import InputError from "@/Components/InputError";
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, useForm } from "@inertiajs/react";
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -200,8 +200,7 @@ export default function Register() {
                     </form>
 
                     <div className="auth-footer-link">
-                        Already registered?{" "}
-                        <Link href={route("login")}>Log in</Link>
+                        Already registered? <a href="/login">Log in</a>
                     </div>
                 </div>
             </div>

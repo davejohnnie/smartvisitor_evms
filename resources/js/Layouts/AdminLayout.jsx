@@ -56,6 +56,15 @@ export default function AdminLayout({ children }) {
                         <span className="nav-icon">👮</span>
                         {sidebarOpen && <span>Guard List</span>}
                     </Link>
+
+                    <Link
+                        href={route("admin.tenants")}
+                        className={`sv-nav-link ${isActive("admin.tenants") ? "active" : ""}`}
+                    >
+                        <span className="nav-icon">🏠</span>
+                        {sidebarOpen && <span>Tenant Management</span>}
+                    </Link>
+
                     <Link
                         href={route("admin.reports")}
                         className={`sv-nav-link ${isActive("admin.reports") ? "active" : ""}`}

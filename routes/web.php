@@ -7,6 +7,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\VisitController;
 use App\Http\Controllers\VisitorController;
 use App\Http\Controllers\IncidentController;
+use Inertia\Inertia;
 
 // Root redirect to login
 Route::get('/', function () {
@@ -57,9 +58,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/reports',          [AdminController::class, 'visitorReport'])->name('reports');
     Route::get('/incidents',        [AdminController::class, 'incidents'])->name('incidents');
     Route::get('/guards', [AdminController::class, 'guardList'])->name('guards.index');
+    Route::get('/tenants',                  [AdminController::class, 'tenantManagement'])->name('tenants');
+    Route::patch('/tenants/{id}/approve',   [AdminController::class, 'approveTenant'])->name('tenants.approve');
 
     // Actions
     Route::post('/guards',                      [AdminController::class, 'storeGuard'])->name('guards.store');
     Route::patch('/incidents/{id}/resolve',     [IncidentController::class, 'resolve'])->name('incidents.resolve');
     Route::get('/reports/download',             [VisitController::class, 'downloadReport'])->name('reports.download');
 });
+
+Route::get('/pending-approval', function () {
+    return Inertia::render('Auth/PendingApproval');
+})->name('registration.pending');

@@ -17,6 +17,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'status',
     ];
 
     protected $hidden = [
@@ -49,7 +50,24 @@ class User extends Authenticatable
     }
 
     // Role helpers — we'll use these everywhere
-    public function isTenant(): bool { return $this->role === 'tenant'; }
-    public function isGuard(): bool  { return $this->role === 'guard'; }
-    public function isAdmin(): bool  { return $this->role === 'admin'; }
+    public function isTenant(): bool
+    {
+        return $this->role === 'tenant';
+    }
+    public function isGuard(): bool
+    {
+        return $this->role === 'guard';
+    }
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+    public function isPending(): bool
+    {
+        return $this->status === 'pending';
+    }
+    public function isApproved(): bool
+    {
+        return $this->status === 'approved';
+    }
 }

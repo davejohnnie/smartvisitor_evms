@@ -24,6 +24,9 @@ class AdminController extends Controller
             'checked_out'          => $visitsToday->where('status', 'checked-out')->count(),
             'pending_incidents'    => Incident::where('status', 'pending')->count(),
             'total_guards'         => Guard::count(),
+            'pending_tenants' => \App\Models\User::where('role', 'tenant')
+                ->where('status', 'pending')
+                ->count(),
         ];
 
         // Visit type breakdown — derived from the same collection, no extra query
@@ -172,5 +175,47 @@ class AdminController extends Controller
             'guards'  => $guards,
             'summary' => $summary,
         ]);
+    }
+
+    public function tenantManagement()
+    {
+        $activeTenants = \App\Models\User::with('tenant')
+            ->where('role', 'tenant')
+            ->where('status', 'approved')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        $pendingTenants = \App\Models\User::with('tenant')
+            ->where('role', 'tenant')
+            ->where('status', 'pending')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
+        return Inertia::render('Admin/TenantManagement', [
+            'activeTenants'  => $activeTenants,
+            'pendingTenants' => $pendingTenants,
+        ]);
+    }
+
+    public function approveTenant(Request $request, $id)
+    {
+        $user = \App\Models\User::findOrFail($id);
+
+        if ($user->role !== 'tenant') {
+            return back()->with('error', 'This user is not a tenant.');
+        }
+
+        $user->update(['status' => 'approved']);
+
+        // SMS notification to tenant
+        $tenantPhone = $user->tenant?->phone_number;
+        if ($tenantPhone) {
+            $sms     = new \App\Services\SmsService();
+            $message = "SmartVisitor: Your account has been approved. You can now log in at " . config('app.url') . "/login. Welcome!";
+            $sms->send($tenantPhone, $message);
+        }
+
+        return redirect()->route('admin.pending-tenants')
+            ->with('success', "{$user->name}'s account has been approved and they have been notified via SMS.");
     }
 }

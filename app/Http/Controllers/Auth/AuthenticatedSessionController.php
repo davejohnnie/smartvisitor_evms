@@ -13,7 +13,6 @@ use Inertia\Response;
 
 class AuthenticatedSessionController extends Controller
 {
-    // Show login form
     public function create(): Response
     {
         return Inertia::render('Auth/Login', [
@@ -22,7 +21,6 @@ class AuthenticatedSessionController extends Controller
         ]);
     }
 
-    // Handle login
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
@@ -30,7 +28,19 @@ class AuthenticatedSessionController extends Controller
 
         $user = auth()->user();
 
-        return match($user->role) {
+        // Block pending tenants from logging in
+        if ($user->role === 'tenant' && $user->isPending()) {
+            Auth::guard('web')->logout();
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            return redirect()->route('login')
+                ->withErrors([
+                    'email' => 'Your account is pending admin approval. You will be notified via SMS once approved.',
+                ]);
+        }
+
+        return match ($user->role) {
             'tenant' => redirect()->route('tenant.dashboard'),
             'guard'  => redirect()->route('guard.dashboard'),
             'admin'  => redirect()->route('admin.dashboard'),
@@ -38,7 +48,6 @@ class AuthenticatedSessionController extends Controller
         };
     }
 
-    // Handle logout
     public function destroy(Request $request): RedirectResponse
     {
         Auth::guard('web')->logout();

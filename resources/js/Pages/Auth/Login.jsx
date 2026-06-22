@@ -1,7 +1,7 @@
 import InputError from "@/Components/InputError";
-import { Head, Link, useForm } from "@inertiajs/react";
+import { Head, useForm } from "@inertiajs/react";
 
-export default function Login({ status, canResetPassword }) {
+export default function Login({ status }) {
     const { data, setData, post, processing, errors, reset } = useForm({
         email: "",
         password: "",
@@ -106,9 +106,7 @@ export default function Login({ status, canResetPassword }) {
 
                     <div className="auth-footer-link">
                         Don't have an account?{" "}
-                        <Link href={route("register")}>
-                            Register as a Tenant
-                        </Link>
+                        <a href="/register">Register as a Tenant</a>
                     </div>
                 </div>
             </div>

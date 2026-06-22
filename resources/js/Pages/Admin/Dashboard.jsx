@@ -144,6 +144,20 @@ export default function Dashboard({
                     <span className="stat-number">{stats.total_guards}</span>
                     <span className="stat-label">Total Guards</span>
                 </div>
+                <a
+                    href={route("admin.tenants")}
+                    style={{ textDecoration: "none" }}
+                >
+                    <div
+                        className="stat-card stat-yellow"
+                        style={{ cursor: "pointer" }}
+                    >
+                        <span className="stat-number">
+                            {stats.pending_tenants}
+                        </span>
+                        <span className="stat-label">Pending Approvals</span>
+                    </div>
+                </a>
             </div>
 
             {/* Charts Row */}
