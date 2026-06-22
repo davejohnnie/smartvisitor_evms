@@ -421,3 +421,53 @@ body.inertia-loading .sv-content {
     pointer-events: none;
     transition: opacity 0.15s ease;
 }
+
+/* ── Error Boundary ──────────────────────────────── */
+.error-boundary {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f4f6f9;
+    padding: 24px;
+}
+
+.error-boundary-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 48px 40px;
+    text-align: center;
+    max-width: 440px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+}
+
+.error-boundary-icon {
+    font-size: 2.6rem;
+    display: block;
+    margin-bottom: 16px;
+}
+
+.error-boundary-card h2 {
+    font-weight: 700;
+    color: #1e2a3a;
+    margin-bottom: 10px;
+}
+
+.error-boundary-card p {
+    color: #718096;
+    font-size: 0.92rem;
+    margin-bottom: 24px;
+    line-height: 1.5;
+}
+
+.error-boundary-details {
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 0.78rem;
+    color: #c53030;
+    text-align: left;
+    overflow-x: auto;
+    margin-bottom: 20px;
+}

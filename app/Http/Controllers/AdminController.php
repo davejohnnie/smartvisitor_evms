@@ -15,58 +15,65 @@ class AdminController extends Controller
     {
         $today = Carbon::today()->toDateString();
 
+        // Single query for today's visits, then derive all stats from the collection in memory
+        $visitsToday = Visit::where('visit_date', $today)->get();
+
         $stats = [
-            'total_visitors_today' => Visit::where('visit_date', $today)->count(),
-            'checked_in'           => Visit::where('visit_date', $today)->where('status', 'checked-in')->count(),
-            'checked_out'          => Visit::where('visit_date', $today)->where('status', 'checked-out')->count(),
+            'total_visitors_today' => $visitsToday->count(),
+            'checked_in'           => $visitsToday->where('status', 'checked-in')->count(),
+            'checked_out'          => $visitsToday->where('status', 'checked-out')->count(),
             'pending_incidents'    => Incident::where('status', 'pending')->count(),
             'total_guards'         => Guard::count(),
         ];
 
-        // Visitors per hour today — for the chart (check-in times)
-        $visitsToday = Visit::where('visit_date', $today)
-            ->whereNotNull('check_in')
-            ->get();
+        // Visit type breakdown — derived from the same collection, no extra query
+        $visitTypeBreakdown = [
+            'invited' => $visitsToday->where('visit_type', 'invited')->count(),
+            'walkin'  => $visitsToday->where('visit_type', 'walkin')->count(),
+        ];
 
+        // Hourly breakdown — derived from the same collection
         $hourlyData = array_fill(0, 24, 0);
-        foreach ($visitsToday as $visit) {
+        foreach ($visitsToday->whereNotNull('check_in') as $visit) {
             $hour = Carbon::parse($visit->check_in)->hour;
             $hourlyData[$hour]++;
         }
-
-        // Peak hour
         $peakHour = array_keys($hourlyData, max($hourlyData))[0] ?? 0;
 
-        // Last 7 days visitor count — for trend
+        // Incident severity — single grouped query instead of 3 separate counts
+        $incidentCounts = Incident::selectRaw('severity, count(*) as count')
+            ->groupBy('severity')
+            ->pluck('count', 'severity');
+
+        $incidentSeverity = [
+            'low'    => $incidentCounts['low'] ?? 0,
+            'medium' => $incidentCounts['medium'] ?? 0,
+            'high'   => $incidentCounts['high'] ?? 0,
+        ];
+
+        // Weekly trend — single grouped query instead of 7 separate counts
+        $startDate = Carbon::today()->subDays(6)->toDateString();
+        $weeklyCounts = Visit::selectRaw('visit_date, count(*) as count')
+            ->where('visit_date', '>=', $startDate)
+            ->groupBy('visit_date')
+            ->pluck('count', 'visit_date');
+
         $weeklyTrend = [];
         for ($i = 6; $i >= 0; $i--) {
             $date = Carbon::today()->subDays($i);
             $weeklyTrend[] = [
                 'date'  => $date->format('D, M j'),
-                'count' => Visit::where('visit_date', $date->toDateString())->count(),
+                'count' => $weeklyCounts[$date->toDateString()] ?? 0,
             ];
         }
 
-        // Visit type breakdown — today
-        $visitTypeBreakdown = [
-            'invited' => Visit::where('visit_date', $today)->where('visit_type', 'invited')->count(),
-            'walkin'  => Visit::where('visit_date', $today)->where('visit_type', 'walkin')->count(),
-        ];
-
-        // Incident severity breakdown — all time
-        $incidentSeverity = [
-            'low'    => Incident::where('severity', 'low')->count(),
-            'medium' => Incident::where('severity', 'medium')->count(),
-            'high'   => Incident::where('severity', 'high')->count(),
-        ];
-
         return Inertia::render('Admin/Dashboard', [
-            'stats'       => $stats,
-            'hourlyData'  => $hourlyData,
-            'peakHour'    => $peakHour,
-            'weeklyTrend' => $weeklyTrend,
-            'visitTypeBreakdown' => $visitTypeBreakdown,
-            'incidentSeverity' => $incidentSeverity,
+            'stats'               => $stats,
+            'hourlyData'          => $hourlyData,
+            'peakHour'            => $peakHour,
+            'weeklyTrend'         => $weeklyTrend,
+            'visitTypeBreakdown'  => $visitTypeBreakdown,
+            'incidentSeverity'    => $incidentSeverity,
         ]);
     }
 

@@ -1,22 +1,22 @@
-import { Head, Link } from '@inertiajs/react';
-import GuardLayout from '@/Layouts/GuardLayout';
+import { Head, Link } from "@inertiajs/react";
+import GuardLayout from "@/Layouts/GuardLayout";
 
 export default function Dashboard({ stats, recentActivity }) {
     const formatTime = (timestamp) => {
-        if (!timestamp) return '—';
+        if (!timestamp) return "—";
         return new Date(timestamp).toLocaleTimeString([], {
-            hour:   '2-digit',
-            minute: '2-digit',
+            hour: "2-digit",
+            minute: "2-digit",
         });
     };
 
     const statusBadge = (status) => {
         const map = {
-            'pending':     'badge bg-warning text-dark',
-            'checked-in':  'badge bg-success',
-            'checked-out': 'badge bg-secondary',
+            pending: "badge bg-warning text-dark",
+            "checked-in": "badge bg-success",
+            "checked-out": "badge bg-secondary",
         };
-        return map[status] || 'badge bg-light';
+        return map[status] || "badge bg-light";
     };
 
     return (
@@ -25,7 +25,9 @@ export default function Dashboard({ stats, recentActivity }) {
 
             <div className="dashboard-header">
                 <h2>Gate Dashboard 🛡️</h2>
-                <p className="text-muted">Today's visitor activity at a glance</p>
+                <p className="text-muted">
+                    Today's visitor activity at a glance
+                </p>
             </div>
 
             {/* Stats Cards */}
@@ -52,13 +54,22 @@ export default function Dashboard({ stats, recentActivity }) {
             <div className="quick-actions mb-4">
                 <h5>Quick Actions</h5>
                 <div className="action-buttons">
-                    <Link href={route('guard.scan')} className="btn btn-success">
+                    <Link
+                        href={route("guard.scan")}
+                        className="btn btn-success"
+                    >
                         📷 Scan QR Code
                     </Link>
-                    <Link href={route('guard.walk-in')} className="btn btn-primary">
+                    <Link
+                        href={route("guard.walk-in")}
+                        className="btn btn-primary"
+                    >
                         ✍️ Register Walk-in
                     </Link>
-                    <Link href={route('guard.visitors')} className="btn btn-outline-secondary">
+                    <Link
+                        href={route("guard.visitors")}
+                        className="btn btn-outline-secondary"
+                    >
                         👥 View Visitor List
                     </Link>
                 </div>
@@ -90,18 +101,26 @@ export default function Dashboard({ stats, recentActivity }) {
                                     <tr key={visit.visit_id}>
                                         <td>{visit.visitor?.full_name}</td>
                                         <td>
-                                            {visit.tenant?.unit_number} —
-                                            Block {visit.tenant?.block}
+                                            {visit.tenant?.unit_number} — Block{" "}
+                                            {visit.tenant?.block}
                                         </td>
                                         <td>{visit.purpose}</td>
                                         <td>{formatTime(visit.check_in)}</td>
                                         <td>
-                                            <span className={`badge ${visit.visit_type === 'walkin' ? 'bg-info text-dark' : 'bg-primary'}`}>
-                                                {visit.visit_type === 'walkin' ? 'Walk-in' : 'Invited'}
+                                            <span
+                                                className={`badge ${visit.visit_type === "walkin" ? "bg-info text-dark" : "bg-primary"}`}
+                                            >
+                                                {visit.visit_type === "walkin"
+                                                    ? "Walk-in"
+                                                    : "Invited"}
                                             </span>
                                         </td>
                                         <td>
-                                            <span className={statusBadge(visit.status)}>
+                                            <span
+                                                className={statusBadge(
+                                                    visit.status,
+                                                )}
+                                            >
                                                 {visit.status}
                                             </span>
                                         </td>
