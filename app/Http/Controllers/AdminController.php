@@ -21,9 +21,9 @@ class AdminController extends Controller
         $stats = [
             'total_visitors_today' => $visitsToday->count(),
             'checked_in'           => $visitsToday->where('status', 'checked-in')->count(),
-            'checked_out'          => $visitsToday->where('status', 'checked-out')->count(),
+            //'checked_out'          => $visitsToday->where('status', 'checked-out')->count(),
             'pending_incidents'    => Incident::where('status', 'pending')->count(),
-            'total_guards'         => Guard::count(),
+            //'total_guards'         => Guard::count(),
             'pending_tenants' => \App\Models\User::where('role', 'tenant')
                 ->where('status', 'pending')
                 ->count(),

@@ -118,7 +118,7 @@ export default function Dashboard({
                 <p className="text-muted">Estate visitor analytics overview</p>
             </div>
 
-            {/* Stats Cards */}
+            {/* Stats Cards — 4 focused cards */}
             <div className="stats-grid">
                 <div className="stat-card stat-blue">
                     <span className="stat-number">
@@ -126,25 +126,19 @@ export default function Dashboard({
                     </span>
                     <span className="stat-label">Visitors Today</span>
                 </div>
+
                 <div className="stat-card stat-green">
                     <span className="stat-number">{stats.checked_in}</span>
                     <span className="stat-label">Currently Inside</span>
                 </div>
-                <div className="stat-card stat-gray">
-                    <span className="stat-number">{stats.checked_out}</span>
-                    <span className="stat-label">Checked Out</span>
-                </div>
+
                 <div className="stat-card stat-red">
                     <span className="stat-number">
                         {stats.pending_incidents}
                     </span>
                     <span className="stat-label">Pending Incidents</span>
                 </div>
-                <div className="stat-card stat-yellow">
-                    <span className="stat-number">{stats.total_guards}</span>
-                    <span className="stat-label">Total Guards</span>
-                </div>
-                <a
+                <a                
                     href={route("admin.tenants")}
                     style={{ textDecoration: "none" }}
                 >
@@ -160,7 +154,7 @@ export default function Dashboard({
                 </a>
             </div>
 
-            {/* Charts Row */}
+            {/* Charts Row 1 */}
             <div className="charts-grid">
                 <div className="page-card">
                     <div className="chart-header">
@@ -179,7 +173,8 @@ export default function Dashboard({
                     <Line data={trendChartData} options={chartOptions} />
                 </div>
             </div>
-            {/* Breakdown Charts Row */}
+
+            {/* Charts Row 2 */}
             <div className="charts-grid mt-4">
                 <div className="page-card">
                     <h5 className="page-title">Visit Type — Today</h5>
@@ -197,7 +192,9 @@ export default function Dashboard({
                 </div>
 
                 <div className="page-card">
-                    <h5 className="page-title">Incident Severity — All Time</h5>
+                    <h5 className="page-title">
+                        Incident Severity — All Time
+                    </h5>
                     {incidentSeverity.low === 0 &&
                     incidentSeverity.medium === 0 &&
                     incidentSeverity.high === 0 ? (
