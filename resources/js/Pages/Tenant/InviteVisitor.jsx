@@ -406,9 +406,14 @@ export default function InviteVisitor() {
                             className="btn btn-primary"
                             disabled={processing}
                         >
-                            {processing
-                                ? "Generating..."
-                                : "🔲 Generate QR & Invite"}
+                            {processing ? (
+                                <span className="btn-loading">
+                                    <span className="btn-spinner"></span>{" "}
+                                    Generating...
+                                </span>
+                            ) : (
+                                "🔲 Generate QR & Invite"
+                            )}
                         </button>
                     </div>
                 </form>
