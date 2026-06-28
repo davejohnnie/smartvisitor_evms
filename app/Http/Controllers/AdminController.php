@@ -215,7 +215,7 @@ class AdminController extends Controller
             $sms->send($tenantPhone, $message);
         }
 
-        return redirect()->route('admin.pending-tenants')
+        return redirect()->route('admin.tenants')
             ->with('success', "{$user->name}'s account has been approved and they have been notified via SMS.");
     }
 }
