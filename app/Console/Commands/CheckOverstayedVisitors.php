@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use App\Models\Visit;
 use App\Services\SmsService;
 use Carbon\Carbon;
+use App\Services\NotificationService;
 
 class CheckOverstayedVisitors extends Command
 {
@@ -43,6 +44,15 @@ class CheckOverstayedVisitors extends Command
                 if ($tenantPhone) {
                     $message = "SmartVisitor Alert: Your visitor {$visitorName} was expected to leave by {$timeOut} but has not checked out yet. Unit {$unit}.";
                     $sms->send($tenantPhone, $message);
+                }
+
+                // In-app notification
+                if ($visit->tenant?->u_id) {
+                    NotificationService::send(
+                        $visit->tenant->u_id,
+                        'overstay',
+                        "{$visitorName} was expected to leave by {$timeOut} but has not checked out yet."
+                    );
                 }
 
                 // Mark as notified so we don't spam

@@ -9,6 +9,7 @@ use App\Models\Visitor;
 use App\Models\Tenant;
 use App\Services\SmsService;
 use Carbon\Carbon;
+use App\Services\NotificationService;
 
 class VisitorController extends Controller
 {
@@ -73,6 +74,14 @@ class VisitorController extends Controller
             $sms     = new SmsService();
             $message = "SmartVisitor: {$visitorName} has walked in and checked in at {$timeIn}. Unit {$unit}.";
             $sms->send($tenantPhone, $message);
+        }
+        // In-app notification
+        if ($visit->tenant?->u_id) {
+            NotificationService::send(
+                $visit->tenant->u_id,
+                'visitor_arrived',
+                "{$visitor->full_name} (walk-in) has checked in at {$timeIn}."
+            );
         }
 
         return redirect()->route('guard.visitors')

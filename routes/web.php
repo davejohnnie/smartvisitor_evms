@@ -7,6 +7,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\VisitController;
 use App\Http\Controllers\VisitorController;
 use App\Http\Controllers\IncidentController;
+use App\Http\Controllers\NotificationController;
 use Inertia\Inertia;
 
 // Root redirect to login
@@ -35,6 +36,11 @@ Route::middleware(['auth', 'tenant'])->prefix('tenant')->name('tenant.')->group(
     // Profile actions
     Route::patch('/profile',          [TenantController::class, 'updateProfile'])->name('profile.update');
     Route::patch('/password',         [TenantController::class, 'updatePassword'])->name('password.update');
+
+    // Notifications
+    Route::get('/notifications',              [NotificationController::class, 'index'])->name('notifications.index');
+    Route::patch('/notifications/{id}/read',  [NotificationController::class, 'markRead'])->name('notifications.read');
+    Route::patch('/notifications/mark-all',   [NotificationController::class, 'markAllRead'])->name('notifications.mark-all');
 });
 
 // ─── Guard Routes ─────────────────────────────────────────────

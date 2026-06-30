@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Incident;
+use App\Services\NotificationService;
 
 class IncidentController extends Controller
 {
@@ -47,6 +48,15 @@ class IncidentController extends Controller
             'resolved_by' => $user->u_id,
             'resolved_at' => now(),
         ]);
+
+        // Notify the tenant about the resolution
+        if ($incident->tenant?->u_id) {
+            NotificationService::send(
+                $incident->tenant->u_id,
+                'incident_resolved',
+                "Your reported incident \"{$incident->title}\" has been resolved."
+            );
+        }
 
         return redirect()->route('admin.incidents')
             ->with('success', 'Incident marked as resolved.');

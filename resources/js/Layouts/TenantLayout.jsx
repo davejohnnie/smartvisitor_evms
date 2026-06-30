@@ -1,6 +1,8 @@
 import { Link, usePage } from "@inertiajs/react";
 import { useState, useEffect } from "react";
 
+import NotificationBell from "@/Components/NotificationBell";
+
 export default function TenantLayout({ children }) {
     const { auth } = usePage().props;
     const { url: currentUrl } = usePage();
@@ -93,6 +95,7 @@ export default function TenantLayout({ children }) {
                         ☰
                     </button>
                     <div className="topbar-user">
+                        <NotificationBell />
                         <span>👤 {auth.user.name}</span>
                         <span className="role-badge tenant-badge">Tenant</span>
                     </div>

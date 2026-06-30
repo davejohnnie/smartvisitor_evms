@@ -8,6 +8,7 @@ use App\Models\Visit;
 use App\Models\Visitor;
 use App\Services\SmsService;
 use Carbon\Carbon;
+use App\Services\NotificationService;
 
 class VisitController extends Controller
 {
@@ -152,6 +153,16 @@ class VisitController extends Controller
             $sms     = new SmsService();
             $message = "SmartVisitor: {$visitorName} has arrived at the gate and checked in at {$timeIn}. Unit {$unit}.";
             $sms->send($tenantPhone, $message);
+        }
+
+        // Create notification for tenant
+        // In-app notification
+        if ($visit->tenant?->u_id) {
+            NotificationService::send(
+                $visit->tenant->u_id,
+                'visitor_arrived',
+                "{$visitorName} has arrived and checked in at {$timeIn}."
+            );
         }
 
         return response()->json([

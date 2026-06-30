@@ -70,4 +70,8 @@ class User extends Authenticatable
     {
         return $this->status === 'approved';
     }
+    public function notifications(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(Notification::class, 'u_id', 'u_id');
+    }
 }
