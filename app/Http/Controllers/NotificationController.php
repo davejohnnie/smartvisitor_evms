@@ -15,7 +15,7 @@ class NotificationController extends Controller
 
         $notifications = Notification::where('u_id', $user->u_id)
             ->orderBy('created_at', 'desc')
-            ->take(20)
+            ->take(30)
             ->get();
 
         $unreadCount = Notification::where('u_id', $user->u_id)
@@ -54,5 +54,33 @@ class NotificationController extends Controller
             ->update(['is_read' => true]);
 
         return response()->json(['message' => 'All marked as read']);
+    }
+
+    // Delete a single notification
+    public function destroy($id)
+    {
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        $notification = Notification::where('notification_id', $id)
+            ->where('u_id', $user->u_id)
+            ->firstOrFail();
+
+        $notification->delete();
+
+        return response()->json(['message' => 'Notification deleted']);
+    }
+
+    // Clear all read notifications
+    public function clearRead()
+    {
+        /** @var \App\Models\User $user */
+        $user = auth()->user();
+
+        Notification::where('u_id', $user->u_id)
+            ->where('is_read', true)
+            ->delete();
+
+        return response()->json(['message' => 'Read notifications cleared']);
     }
 }

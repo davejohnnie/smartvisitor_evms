@@ -41,6 +41,8 @@ Route::middleware(['auth', 'tenant'])->prefix('tenant')->name('tenant.')->group(
     Route::get('/notifications',              [NotificationController::class, 'index'])->name('notifications.index');
     Route::patch('/notifications/{id}/read',  [NotificationController::class, 'markRead'])->name('notifications.read');
     Route::patch('/notifications/mark-all',   [NotificationController::class, 'markAllRead'])->name('notifications.mark-all');
+    Route::delete('/notifications/{id}',      [NotificationController::class, 'destroy'])->name('notifications.destroy');
+    Route::delete('/notifications/clear-read', [NotificationController::class, 'clearRead'])->name('notifications.clear-read');
 });
 
 // ─── Guard Routes ─────────────────────────────────────────────

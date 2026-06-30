@@ -46,8 +46,8 @@
     position: absolute;
     top: calc(100% + 10px);
     right: 0;
-    width: 340px;
-    max-height: 420px;
+    width: 360px;
+    max-height: 460px;
     background: #fff;
     border-radius: 12px;
     box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
@@ -77,6 +77,48 @@
     cursor: pointer;
 }
 
+/* Filter Tabs */
+.notification-filter-tabs {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 16px;
+    border-bottom: 1px solid #e2e8f0;
+    background: #fafbfc;
+}
+
+.notif-filter-tab {
+    background: none;
+    border: none;
+    padding: 5px 12px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #718096;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+}
+
+.notif-filter-tab:hover { background: #edf2f7; }
+
+.notif-filter-tab.active {
+    background: #1e2a3a;
+    color: #fff;
+}
+
+.notif-clear-read-btn {
+    margin-left: auto;
+    background: none;
+    border: none;
+    font-size: 0.74rem;
+    color: #c53030;
+    cursor: pointer;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.notif-clear-read-btn:hover { text-decoration: underline; }
+
 .notification-dropdown-body {
     overflow-y: auto;
     max-height: 360px;
@@ -88,6 +130,7 @@
     gap: 10px;
     padding: 12px 16px;
     border-bottom: 1px solid #f0f0f0;
+    border-left: 3px solid transparent;
     cursor: pointer;
     transition: background 0.15s;
     position: relative;
@@ -95,13 +138,27 @@
 
 .notification-item:hover { background: #f7fafc; }
 
+.notification-item:hover .notification-delete-btn {
+    opacity: 1;
+}
+
 .notification-item.unread {
     background: #ebf8ff;
 }
 
+/* Color-coded left border by type */
+.notification-item.notif-arrived   { border-left-color: #48bb78; }
+.notification-item.notif-overstay  { border-left-color: #ecc94b; }
+.notification-item.notif-resolved  { border-left-color: #4299e1; }
+
 .notification-icon {
     font-size: 1.1rem;
     flex-shrink: 0;
+}
+
+.notification-content {
+    flex: 1;
+    min-width: 0;
 }
 
 .notification-content p {
@@ -119,11 +176,28 @@
 .unread-dot {
     position: absolute;
     top: 14px;
-    right: 14px;
+    right: 34px;
     width: 8px;
     height: 8px;
     background: #4299e1;
     border-radius: 50%;
+}
+
+.notification-delete-btn {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    color: #cbd5e0;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.15s, color 0.15s;
+    line-height: 1;
+    padding: 2px 4px;
+    flex-shrink: 0;
+}
+
+.notification-delete-btn:hover {
+    color: #c53030;
 }
 
 .notification-empty {

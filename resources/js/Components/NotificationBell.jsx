@@ -5,6 +5,7 @@ export default function NotificationBell() {
     const [notifications, setNotifications] = useState([]);
     const [unreadCount, setUnreadCount] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
+    const [filter, setFilter] = useState("all");
     const dropdownRef = useRef(null);
 
     const getXsrfToken = () => {
@@ -28,12 +29,10 @@ export default function NotificationBell() {
 
     useEffect(() => {
         fetchNotifications();
-        // Poll every 30 seconds for new notifications
         const interval = setInterval(fetchNotifications, 30000);
         return () => clearInterval(interval);
     }, []);
 
-    // Close dropdown when clicking outside
     useEffect(() => {
         const handleClickOutside = (e) => {
             if (
@@ -82,6 +81,35 @@ export default function NotificationBell() {
         }
     };
 
+    const handleDelete = async (id, e) => {
+        e.stopPropagation();
+        try {
+            await axios.delete(route("tenant.notifications.destroy", id), {
+                headers: { "X-XSRF-TOKEN": getXsrfToken() },
+            });
+            const wasUnread =
+                notifications.find((n) => n.notification_id === id)?.is_read ===
+                false;
+            setNotifications((prev) =>
+                prev.filter((n) => n.notification_id !== id),
+            );
+            if (wasUnread) setUnreadCount((prev) => Math.max(0, prev - 1));
+        } catch (err) {
+            console.error("Failed to delete notification", err);
+        }
+    };
+
+    const handleClearRead = async () => {
+        try {
+            await axios.delete(route("tenant.notifications.clear-read"), {
+                headers: { "X-XSRF-TOKEN": getXsrfToken() },
+            });
+            setNotifications((prev) => prev.filter((n) => !n.is_read));
+        } catch (err) {
+            console.error("Failed to clear read notifications", err);
+        }
+    };
+
     const typeIcon = (type) => {
         const map = {
             visitor_arrived: "🚪",
@@ -89,6 +117,15 @@ export default function NotificationBell() {
             incident_resolved: "✅",
         };
         return map[type] || "🔔";
+    };
+
+    const typeClass = (type) => {
+        const map = {
+            visitor_arrived: "notif-arrived",
+            overstay: "notif-overstay",
+            incident_resolved: "notif-resolved",
+        };
+        return map[type] || "";
     };
 
     const formatTime = (t) => {
@@ -101,6 +138,12 @@ export default function NotificationBell() {
         if (diffMins < 1440) return `${Math.floor(diffMins / 60)}h ago`;
         return date.toLocaleDateString("en-KE", { dateStyle: "medium" });
     };
+
+    const filteredNotifications = notifications.filter((n) =>
+        filter === "unread" ? !n.is_read : true,
+    );
+
+    const readCount = notifications.filter((n) => n.is_read).length;
 
     return (
         <div className="notification-bell-wrapper" ref={dropdownRef}>
@@ -130,17 +173,45 @@ export default function NotificationBell() {
                         )}
                     </div>
 
+                    {/* Filter Tabs */}
+                    <div className="notification-filter-tabs">
+                        <button
+                            className={`notif-filter-tab ${filter === "all" ? "active" : ""}`}
+                            onClick={() => setFilter("all")}
+                        >
+                            All ({notifications.length})
+                        </button>
+                        <button
+                            className={`notif-filter-tab ${filter === "unread" ? "active" : ""}`}
+                            onClick={() => setFilter("unread")}
+                        >
+                            Unread ({unreadCount})
+                        </button>
+                        {readCount > 0 && (
+                            <button
+                                className="notif-clear-read-btn"
+                                onClick={handleClearRead}
+                            >
+                                🗑 Clear read
+                            </button>
+                        )}
+                    </div>
+
                     <div className="notification-dropdown-body">
-                        {notifications.length === 0 ? (
+                        {filteredNotifications.length === 0 ? (
                             <div className="notification-empty">
                                 <span>🔕</span>
-                                <p>No notifications yet</p>
+                                <p>
+                                    {filter === "unread"
+                                        ? "No unread notifications"
+                                        : "No notifications yet"}
+                                </p>
                             </div>
                         ) : (
-                            notifications.map((n) => (
+                            filteredNotifications.map((n) => (
                                 <div
                                     key={n.notification_id}
-                                    className={`notification-item ${!n.is_read ? "unread" : ""}`}
+                                    className={`notification-item ${typeClass(n.type)} ${!n.is_read ? "unread" : ""}`}
                                     onClick={() =>
                                         !n.is_read &&
                                         handleMarkRead(n.notification_id)
@@ -158,6 +229,15 @@ export default function NotificationBell() {
                                     {!n.is_read && (
                                         <span className="unread-dot"></span>
                                     )}
+                                    <button
+                                        className="notification-delete-btn"
+                                        onClick={(e) =>
+                                            handleDelete(n.notification_id, e)
+                                        }
+                                        title="Delete"
+                                    >
+                                        ×
+                                    </button>
                                 </div>
                             ))
                         )}
