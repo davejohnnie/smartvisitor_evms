@@ -68,6 +68,8 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('/guards', [AdminController::class, 'guardList'])->name('guards.index');
     Route::get('/tenants',                  [AdminController::class, 'tenantManagement'])->name('tenants');
     Route::patch('/tenants/{id}/approve',   [AdminController::class, 'approveTenant'])->name('tenants.approve');
+    Route::patch('/tenants/{id}/reject', [AdminController::class, 'rejectTenant'])->name('tenants.reject');
+    
 
     // Actions
     Route::post('/guards',                      [AdminController::class, 'storeGuard'])->name('guards.store');

@@ -28,16 +28,14 @@ export default function Login({ status }) {
                 </p>
                 <div className="auth-side-list">
                     <div className="auth-side-list-item">
-                        <span className="icon">📷</span> QR invites guards scan
-                        in seconds
+                        <span className="icon">📷</span> Scan QR invites in seconds
                     </div>
                     <div className="auth-side-list-item">
                         <span className="icon">📲</span> SMS the moment your
                         visitor arrives
                     </div>
                     <div className="auth-side-list-item">
-                        <span className="icon">📊</span> Real gate activity, not
-                        paper logs
+                        <span className="icon">📊</span> Realtime gate activity
                     </div>
                 </div>
             </div>

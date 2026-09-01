@@ -191,9 +191,16 @@ class AdminController extends Controller
             ->orderBy('created_at', 'desc')
             ->get();
 
+        $rejectedTenants = \App\Models\User::with('tenant')
+            ->where('role', 'tenant')
+            ->where('status', 'rejected')
+            ->orderBy('created_at', 'desc')
+            ->get();
+
         return Inertia::render('Admin/TenantManagement', [
-            'activeTenants'  => $activeTenants,
-            'pendingTenants' => $pendingTenants,
+            'activeTenants'   => $activeTenants,
+            'pendingTenants'  => $pendingTenants,
+            'rejectedTenants' => $rejectedTenants,
         ]);
     }
 
@@ -217,5 +224,34 @@ class AdminController extends Controller
 
         return redirect()->route('admin.tenants')
             ->with('success', "{$user->name}'s account has been approved and they have been notified via SMS.");
+    }
+    public function rejectTenant(Request $request, $id)
+    {
+        $user = \App\Models\User::findOrFail($id);
+
+        if ($user->role !== 'tenant') {
+            return back()->with('error', 'This user is not a tenant.');
+        }
+
+        if ($user->isApproved()) {
+            return back()->with('error', 'This tenant is already approved and cannot be rejected.');
+        }
+
+        $request->validate([
+            'reason' => 'nullable|string|max:255',
+        ]);
+
+        $user->update(['status' => 'rejected']);
+
+        // Optional SMS to notify tenant of rejection
+        // $tenantPhone = $user->tenant?->phone_number;
+        // if ($tenantPhone) {
+        //     $sms     = new \App\Services\SmsService();
+        //     $message = "SmartVisitor: Your registration was not approved. Please contact estate management for assistance.";
+        //     $sms->send($tenantPhone, $message);
+        // }
+
+        return redirect()->route('admin.tenants')
+            ->with('success', "{$user->name}'s registration has been rejected.");
     }
 }

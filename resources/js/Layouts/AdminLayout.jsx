@@ -9,7 +9,6 @@ export default function AdminLayout({ children }) {
     const isActive = (routeName) =>
         currentUrl === route(routeName, undefined, false);
 
-    // Auto-close sidebar on small screens after navigating
     useEffect(() => {
         if (window.innerWidth <= 768) {
             setSidebarOpen(false);
@@ -18,19 +17,25 @@ export default function AdminLayout({ children }) {
 
     return (
         <div className="sv-wrapper">
-            {/* Mobile backdrop */}
             <div
                 className={`sidebar-backdrop ${sidebarOpen ? "show" : ""}`}
                 onClick={() => setSidebarOpen(false)}
             />
 
-            <aside
-                className={`sv-sidebar admin-sidebar ${sidebarOpen ? "open" : "closed"}`}
-            >
+            <aside className={`sv-sidebar admin-sidebar ${sidebarOpen ? "open" : "closed"}`}>
                 <div className="sv-brand">
-                    <span className="brand-icon">⚙️</span>
+                    <button
+                        className="sidebar-toggle"
+                        onClick={() => setSidebarOpen(!sidebarOpen)}
+                        title={sidebarOpen ? "Collapse sidebar" : "Expand sidebar"}
+                    >
+                        {sidebarOpen ? "✕" : "☰"}
+                    </button>
                     {sidebarOpen && (
-                        <span className="brand-name">SmartVisitor</span>
+                        <div className="sv-brand-content">
+                            <span className="brand-icon">⚙️</span>
+                            <span className="brand-name">SmartVisitor</span>
+                        </div>
                     )}
                 </div>
 
@@ -56,7 +61,6 @@ export default function AdminLayout({ children }) {
                         <span className="nav-icon">👮</span>
                         {sidebarOpen && <span>Guard List</span>}
                     </Link>
-
                     <Link
                         href={route("admin.tenants")}
                         className={`sv-nav-link ${isActive("admin.tenants") ? "active" : ""}`}
@@ -64,7 +68,6 @@ export default function AdminLayout({ children }) {
                         <span className="nav-icon">🏠</span>
                         {sidebarOpen && <span>Tenant Management</span>}
                     </Link>
-
                     <Link
                         href={route("admin.reports")}
                         className={`sv-nav-link ${isActive("admin.reports") ? "active" : ""}`}
@@ -96,18 +99,11 @@ export default function AdminLayout({ children }) {
 
             <div className="sv-main">
                 <header className="sv-topbar">
-                    <button
-                        className="sidebar-toggle"
-                        onClick={() => setSidebarOpen(!sidebarOpen)}
-                    >
-                        ☰
-                    </button>
                     <div className="topbar-user">
                         <span>⚙️ {auth.user.name}</span>
                         <span className="role-badge admin-badge">Admin</span>
                     </div>
                 </header>
-
                 <main className="sv-content">{children}</main>
             </div>
         </div>

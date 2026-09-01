@@ -32,6 +32,7 @@
             color: var(--ink);
             line-height: 1.5;
             -webkit-font-smoothing: antialiased;
+            padding: 0 24px;
         }
 
         h1,
@@ -50,13 +51,21 @@
             color: inherit;
         }
 
+        .nav,
+        .hero,
+        .roles,
+        .cta-strip,
+        footer {
+            max-width: 1480px;
+        }
+
         /* ── Nav ── */
         .nav {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 24px 48px;
-            max-width: 1200px;
+            max-width: 1480px;
             margin: 0 auto;
         }
 
@@ -103,7 +112,7 @@
 
         /* ── Hero ── */
         .hero {
-            max-width: 1200px;
+            max-width: 1480px;
             margin: 0 auto;
             padding: 64px 48px 40px;
             display: grid;
@@ -355,7 +364,7 @@
 
         /* ── Roles Section ── */
         .roles {
-            max-width: 1200px;
+            max-width: 1480px;
             margin: 100px auto 0;
             padding: 0 48px;
         }
@@ -451,7 +460,7 @@
 
         /* ── CTA Strip ── */
         .cta-strip {
-            max-width: 1200px;
+            max-width: 1480px;
             margin: 100px auto 0;
             padding: 0 48px;
         }
@@ -492,7 +501,7 @@
 
         /* ── Footer ── */
         footer {
-            max-width: 1200px;
+            max-width: 1480px;
             margin: 80px auto 0;
             padding: 32px 48px 48px;
             display: flex;
@@ -677,7 +686,7 @@
 
     <footer>
         <span>🏢 SmartVisitor</span>
-        <span>&copy; {{ date('Y') }} SmartVisitor. Built for estates that take their gate seriously.</span>
+        <span>&copy; {{ date('Y') }} SmartVisitor. Your Gate. Your Safety. Your Future.</span>
     </footer>
 
 </body>

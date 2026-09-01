@@ -32,8 +32,7 @@ export default function Register() {
                 </p>
                 <div className="auth-side-list">
                     <div className="auth-side-list-item">
-                        <span className="icon">⚡</span> Quick setup, no
-                        approval wait
+                        <span className="icon">⚡</span> Quick and easy setup
                     </div>
                     <div className="auth-side-list-item">
                         <span className="icon">🔒</span> Your unit details stay
