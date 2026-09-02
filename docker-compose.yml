@@ -1,0 +1,59 @@
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    ports:
+      - "8080:80"
+    environment:
+      APP_NAME: SmartVisitor
+      APP_ENV: local
+      APP_KEY: base64:HUD4RPbg88MjqflEXRwSR+kfPsRnn5NVVl3LV9Xs0eU=
+      APP_DEBUG: "true"
+      APP_URL: http://localhost:8080
+      APP_TIMEZONE: Africa/Nairobi
+      DB_CONNECTION: mysql
+      DB_HOST: mysql
+      DB_PORT: "3306"
+      DB_DATABASE: smartvisitor_evms
+      DB_USERNAME: smartvisitor
+      DB_PASSWORD: secret
+      SESSION_DRIVER: file
+      CACHE_STORE: file
+      QUEUE_CONNECTION: sync
+      AT_USERNAME: smartvisitor_smv
+      AT_API_KEY: atsk_362efc90a7d6b1f6e026bd2229cde4fcd79f6975f85559a11af5ef97b3f0c4c91865aff4
+      AT_SENDER_ID: ""
+      LOG_LEVEL: debug
+    volumes:
+      - storage_data:/var/www/html/storage
+    depends_on:
+      mysql:
+        condition: service_healthy
+    restart: unless-stopped
+
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: smartvisitor_evms
+      MYSQL_USER: smartvisitor
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: rootsecret
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "smartvisitor", "-psecret"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  mysql_data:
+    driver: local
+  storage_data:
+    driver: local
