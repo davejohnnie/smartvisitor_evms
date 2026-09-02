@@ -1,9 +1,10 @@
 import InputError from "@/Components/InputError";
 import { Head, useForm } from "@inertiajs/react";
 import { useState } from "react";
-const [showPassword, setShowPassword] = useState(false);
+
 
 export default function Login({ status }) {
+    const [showPassword, setShowPassword] = useState(false);
     const { data, setData, post, processing, errors, reset } = useForm({
         email: "",
         password: "",
@@ -106,7 +107,7 @@ export default function Login({ status }) {
                                     }}
                                     tabIndex={-1}
                                 >
-                                    {showPassword ? "🙈 Hide" : "👁 Show"}
+                                    {showPassword ? "🔒 Hide" : "👁 Show"}
                                 </button>
                             </div>
                             <InputError

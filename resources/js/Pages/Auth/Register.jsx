@@ -1,10 +1,10 @@
 import InputError from "@/Components/InputError";
 import { Head, useForm } from "@inertiajs/react";
 import { useState } from "react";
-const [showPassword, setShowPassword] = useState(false);
-const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
 export default function Register() {
+    const [showPassword, setShowPassword] = useState(false);
+    const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
     const { data, setData, post, processing, errors, reset } = useForm({
         name: "",
         email: "",
@@ -180,7 +180,7 @@ export default function Register() {
                                     }}
                                     tabIndex={-1}
                                 >
-                                    {showPassword ? "🙈 Hide" : "👁 Show"}
+                                    {showPassword ? "🔒 Hide" : "👁 Show"}
                                 </button>
                             </div>
                             <InputError
@@ -196,7 +196,11 @@ export default function Register() {
                             <div style={{ position: "relative" }}>
                                 <input
                                     id="password_confirmation"
-                                    type={showPasswordConfirm ? "text" : "password"}
+                                    type={
+                                        showPasswordConfirm
+                                            ? "text"
+                                            : "password"
+                                    }
                                     value={data.password_confirmation}
                                     autoComplete="new-password"
                                     onChange={(e) =>
@@ -210,7 +214,9 @@ export default function Register() {
                                 />
                                 <button
                                     type="button"
-                                    onClick={() => setShowPasswordConfirm((v) => !v)}
+                                    onClick={() =>
+                                        setShowPasswordConfirm((v) => !v)
+                                    }
                                     style={{
                                         position: "absolute",
                                         right: "12px",
@@ -223,7 +229,9 @@ export default function Register() {
                                     }}
                                     tabIndex={-1}
                                 >
-                                    {showPasswordConfirm ? "🙈 Hide" : "👁 Show"}
+                                    {showPasswordConfirm
+                                        ? "🔒 Hide"
+                                        : "👁 Show"}
                                 </button>
                             </div>
                             <InputError
