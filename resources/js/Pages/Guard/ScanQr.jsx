@@ -1,40 +1,42 @@
-import { Head } from '@inertiajs/react';
-import GuardLayout from '@/Layouts/GuardLayout';
-import { useState, useEffect, useRef } from 'react';
-import axios from 'axios';
-import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode';
+import { Head } from "@inertiajs/react";
+import GuardLayout from "@/Layouts/GuardLayout";
+import { useState, useEffect, useRef } from "react";
+import axios from "axios";
+import { Html5Qrcode, Html5QrcodeSupportedFormats } from "html5-qrcode";
 
 export default function ScanQr() {
-    const [scanning, setScanning]           = useState(false);
-    const [result, setResult]               = useState(null);
-    const [error, setError]                 = useState(null);
-    const [actionMsg, setActionMsg]         = useState(null);
+    const [scanning, setScanning] = useState(false);
+    const [result, setResult] = useState(null);
+    const [error, setError] = useState(null);
+    const [actionMsg, setActionMsg] = useState(null);
     const [actionLoading, setActionLoading] = useState(false);
-    const [manualToken, setManualToken]     = useState('');
-    const [activeTab, setActiveTab]         = useState('camera');
+    const [manualToken, setManualToken] = useState("");
+    const [activeTab, setActiveTab] = useState("camera");
     const html5QrRef = useRef(null);
 
     // Get XSRF token from cookie
     const getXsrfToken = () => {
         return decodeURIComponent(
             document.cookie
-                .split('; ')
-                .find((r) => r.startsWith('XSRF-TOKEN='))
-                ?.split('=')[1] || ''
+                .split("; ")
+                .find((r) => r.startsWith("XSRF-TOKEN="))
+                ?.split("=")[1] || "",
         );
     };
 
     const verifyToken = async (token) => {
         try {
             const response = await axios.post(
-                route('guard.visits.verify-qr'),
+                route("guard.visits.verify-qr"),
                 { qr_token: token },
-                { headers: { 'X-XSRF-TOKEN': getXsrfToken() } }
+                { headers: { "X-XSRF-TOKEN": getXsrfToken() } },
             );
             setResult(response.data);
             setError(null);
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to verify QR code.');
+            setError(
+                err.response?.data?.message || "Failed to verify QR code.",
+            );
             setResult(null);
         }
     };
@@ -47,43 +49,51 @@ export default function ScanQr() {
         // Small delay to ensure the div is rendered in the DOM
         setTimeout(async () => {
             try {
-                const html5Qr = new Html5Qrcode('qr-reader', {
+                const html5Qr = new Html5Qrcode("qr-reader", {
                     formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE],
                     verbose: false,
                 });
                 html5QrRef.current = html5Qr;
 
-                // Try rear camera first, fall back to front camera (PC)
+                const onScanSuccess = async (decodedText) => {
+                    await html5Qr.stop();
+                    html5QrRef.current = null;
+                    setScanning(false);
+                    await verifyToken(decodedText);
+                };
+
+                // Try to explicitly pick the rear camera via device enumeration,
+                // falling back to a facingMode guess if enumeration isn't supported.
                 try {
+                    const cameras = await Html5Qrcode.getCameras();
+                    const backCam = cameras.find((c) =>
+                        /back|rear|environment/i.test(c.label),
+                    );
+                    const cameraId = backCam
+                        ? backCam.id
+                        : cameras[cameras.length - 1]?.id;
+
                     await html5Qr.start(
-                        { facingMode: 'environment' },
-                        { fps: 10, qrbox: { width: 250, height: 250 } },
-                        async (decodedText) => {
-                            await html5Qr.stop();
-                            html5QrRef.current = null;
-                            setScanning(false);
-                            await verifyToken(decodedText);
-                        },
-                        () => {}
+                        cameraId || { facingMode: "environment" },
+                        { fps: 10, qrbox: { width: 280, height: 280 } },
+                        onScanSuccess,
+                        () => {},
                     );
                 } catch {
                     // Fall back to front-facing camera (PC/laptop)
                     await html5Qr.start(
-                        { facingMode: 'user' },
-                        { fps: 10, qrbox: { width: 250, height: 250 } },
-                        async (decodedText) => {
-                            await html5Qr.stop();
-                            html5QrRef.current = null;
-                            setScanning(false);
-                            await verifyToken(decodedText);
-                        },
-                        () => {}
+                        { facingMode: "user" },
+                        { fps: 10, qrbox: { width: 280, height: 280 } },
+                        onScanSuccess,
+                        () => {},
                     );
                 }
 
                 setScanning(true);
             } catch (err) {
-                setError('Could not access camera. Please allow camera permissions or use manual entry below.');
+                setError(
+                    "Could not access camera. Please allow camera permissions or use manual entry below.",
+                );
                 setScanning(false);
             }
         }, 100);
@@ -116,26 +126,26 @@ export default function ScanQr() {
         setError(null);
         setActionMsg(null);
         await verifyToken(manualToken.trim());
-        setManualToken('');
+        setManualToken("");
     };
 
     const handleCheckIn = async (visitId) => {
         setActionLoading(true);
         try {
             const res = await axios.patch(
-                route('guard.visits.check-in', visitId),
+                route("guard.visits.check-in", visitId),
                 {},
-                { headers: { 'X-XSRF-TOKEN': getXsrfToken() } }
+                { headers: { "X-XSRF-TOKEN": getXsrfToken() } },
             );
-            setActionMsg({ type: 'success', text: res.data.message });
+            setActionMsg({ type: "success", text: res.data.message });
             setResult((prev) => ({
                 ...prev,
-                visit: { ...prev.visit, status: 'checked-in' },
+                visit: { ...prev.visit, status: "checked-in" },
             }));
         } catch (err) {
             setActionMsg({
-                type: 'error',
-                text: err.response?.data?.message || 'Check-in failed.',
+                type: "error",
+                text: err.response?.data?.message || "Check-in failed.",
             });
         } finally {
             setActionLoading(false);
@@ -146,19 +156,19 @@ export default function ScanQr() {
         setActionLoading(true);
         try {
             const res = await axios.patch(
-                route('guard.visits.check-out', visitId),
+                route("guard.visits.check-out", visitId),
                 {},
-                { headers: { 'X-XSRF-TOKEN': getXsrfToken() } }
+                { headers: { "X-XSRF-TOKEN": getXsrfToken() } },
             );
-            setActionMsg({ type: 'success', text: res.data.message });
+            setActionMsg({ type: "success", text: res.data.message });
             setResult((prev) => ({
                 ...prev,
-                visit: { ...prev.visit, status: 'checked-out' },
+                visit: { ...prev.visit, status: "checked-out" },
             }));
         } catch (err) {
             setActionMsg({
-                type: 'error',
-                text: err.response?.data?.message || 'Check-out failed.',
+                type: "error",
+                text: err.response?.data?.message || "Check-out failed.",
             });
         } finally {
             setActionLoading(false);
@@ -169,19 +179,24 @@ export default function ScanQr() {
         setResult(null);
         setError(null);
         setActionMsg(null);
-        setManualToken('');
+        setManualToken("");
     };
 
     const formatTime = (t) =>
-        t ? new Date(t).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '—';
+        t
+            ? new Date(t).toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+              })
+            : "—";
 
     const statusBadge = (status) => {
         const map = {
-            'pending':     'badge bg-warning text-dark',
-            'checked-in':  'badge bg-success',
-            'checked-out': 'badge bg-secondary',
+            pending: "badge bg-warning text-dark",
+            "checked-in": "badge bg-success",
+            "checked-out": "badge bg-secondary",
         };
-        return map[status] || 'badge bg-light';
+        return map[status] || "badge bg-light";
     };
 
     return (
@@ -197,34 +212,51 @@ export default function ScanQr() {
                 {/* Input Method Tabs */}
                 <div className="profile-tabs mb-4">
                     <button
-                        className={`profile-tab ${activeTab === 'camera' ? 'active' : ''}`}
-                        onClick={() => { setActiveTab('camera'); stopScanner(); resetAll(); }}
+                        className={`profile-tab ${activeTab === "camera" ? "active" : ""}`}
+                        onClick={() => {
+                            setActiveTab("camera");
+                            stopScanner();
+                            resetAll();
+                        }}
                     >
                         📷 Camera Scan
                     </button>
                     <button
-                        className={`profile-tab ${activeTab === 'manual' ? 'active' : ''}`}
-                        onClick={() => { setActiveTab('manual'); stopScanner(); resetAll(); }}
+                        className={`profile-tab ${activeTab === "manual" ? "active" : ""}`}
+                        onClick={() => {
+                            setActiveTab("manual");
+                            stopScanner();
+                            resetAll();
+                        }}
                     >
                         ⌨️ Manual Entry
                     </button>
                 </div>
 
                 {/* ── Camera Tab ── */}
-                {activeTab === 'camera' && (
+                {activeTab === "camera" && (
                     <div>
                         <div className="d-flex gap-2 mb-4">
                             {!scanning ? (
-                                <button className="btn btn-success" onClick={startScanner}>
+                                <button
+                                    className="btn btn-success"
+                                    onClick={startScanner}
+                                >
                                     📷 Start Camera
                                 </button>
                             ) : (
-                                <button className="btn btn-danger" onClick={stopScanner}>
+                                <button
+                                    className="btn btn-danger"
+                                    onClick={stopScanner}
+                                >
                                     ⏹ Stop Camera
                                 </button>
                             )}
                             {(result || error) && (
-                                <button className="btn btn-outline-secondary" onClick={resetAll}>
+                                <button
+                                    className="btn btn-outline-secondary"
+                                    onClick={resetAll}
+                                >
                                     🔄 Scan Another
                                 </button>
                             )}
@@ -233,15 +265,26 @@ export default function ScanQr() {
                         {/* Camera viewfinder */}
                         <div
                             id="qr-reader"
-                            style={{ display: scanning ? 'block' : 'none', marginBottom: '20px' }}
+                            style={{
+                                visibility: scanning ? "visible" : "hidden",
+                                height: scanning ? "auto" : "0",
+                                overflow: "hidden",
+                                marginBottom: scanning ? "20px" : "0",
+                            }}
                         />
 
                         {!scanning && !result && !error && (
                             <div className="scanner-placeholder">
-                                <span className="scanner-placeholder-icon">📷</span>
-                                <p>Camera is off — press <strong>Start Camera</strong> to begin</p>
+                                <span className="scanner-placeholder-icon">
+                                    📷
+                                </span>
+                                <p>
+                                    Camera is off — press{" "}
+                                    <strong>Start Camera</strong> to begin
+                                </p>
                                 <small className="text-muted">
-                                    On a PC, your front-facing webcam will be used
+                                    On a PC, your front-facing webcam will be
+                                    used
                                 </small>
                             </div>
                         )}
@@ -249,13 +292,16 @@ export default function ScanQr() {
                 )}
 
                 {/* ── Manual Entry Tab ── */}
-                {activeTab === 'manual' && (
+                {activeTab === "manual" && (
                     <div>
                         <p className="text-muted mb-3">
-                            Ask the visitor to show their QR token text, or copy it from
-                            the invitation. Paste it below to verify.
+                            Ask the visitor to show their QR token text, or copy
+                            it from the invitation. Paste it below to verify.
                         </p>
-                        <form onSubmit={handleManualSubmit} className="d-flex gap-2 mb-4">
+                        <form
+                            onSubmit={handleManualSubmit}
+                            className="d-flex gap-2 mb-4"
+                        >
                             <input
                                 type="text"
                                 className="form-control"
@@ -264,12 +310,18 @@ export default function ScanQr() {
                                 onChange={(e) => setManualToken(e.target.value)}
                                 required
                             />
-                            <button type="submit" className="btn btn-success text-nowrap">
+                            <button
+                                type="submit"
+                                className="btn btn-success text-nowrap"
+                            >
                                 ✅ Verify
                             </button>
                         </form>
                         {(result || error) && (
-                            <button className="btn btn-outline-secondary btn-sm mb-4" onClick={resetAll}>
+                            <button
+                                className="btn btn-outline-secondary btn-sm mb-4"
+                                onClick={resetAll}
+                            >
                                 🔄 Verify Another
                             </button>
                         )}
@@ -277,14 +329,15 @@ export default function ScanQr() {
                 )}
 
                 {/* ── Error State ── */}
-                {error && (
-                    <div className="alert alert-danger">❌ {error}</div>
-                )}
+                {error && <div className="alert alert-danger">❌ {error}</div>}
 
                 {/* ── Action Message ── */}
                 {actionMsg && (
-                    <div className={`alert ${actionMsg.type === 'success' ? 'alert-success' : 'alert-danger'}`}>
-                        {actionMsg.type === 'success' ? '✅' : '❌'} {actionMsg.text}
+                    <div
+                        className={`alert ${actionMsg.type === "success" ? "alert-success" : "alert-danger"}`}
+                    >
+                        {actionMsg.type === "success" ? "✅" : "❌"}{" "}
+                        {actionMsg.text}
                     </div>
                 )}
 
@@ -300,78 +353,117 @@ export default function ScanQr() {
 
                         <div className="visit-result-grid">
                             <div className="visit-result-section">
-                                <h6 className="section-label">👤 Visitor Details</h6>
+                                <h6 className="section-label">
+                                    👤 Visitor Details
+                                </h6>
                                 <div className="result-item">
                                     <span className="result-label">Name</span>
-                                    <span className="result-value">{result.visit.visitor?.full_name}</span>
+                                    <span className="result-value">
+                                        {result.visit.visitor?.full_name}
+                                    </span>
                                 </div>
                                 <div className="result-item">
                                     <span className="result-label">Phone</span>
-                                    <span className="result-value">{result.visit.visitor?.phone_number}</span>
+                                    <span className="result-value">
+                                        {result.visit.visitor?.phone_number}
+                                    </span>
                                 </div>
                                 <div className="result-item">
-                                    <span className="result-label">ID Number</span>
-                                    <span className="result-value">{result.visit.visitor?.id_number}</span>
+                                    <span className="result-label">
+                                        ID Number
+                                    </span>
+                                    <span className="result-value">
+                                        {result.visit.visitor?.id_number}
+                                    </span>
                                 </div>
                             </div>
 
                             <div className="visit-result-section">
-                                <h6 className="section-label">🏢 Visit Details</h6>
+                                <h6 className="section-label">
+                                    🏢 Visit Details
+                                </h6>
                                 <div className="result-item">
                                     <span className="result-label">Tenant</span>
-                                    <span className="result-value">{result.visit.tenant?.user?.name}</span>
+                                    <span className="result-value">
+                                        {result.visit.tenant?.user?.name}
+                                    </span>
                                 </div>
                                 <div className="result-item">
                                     <span className="result-label">Unit</span>
                                     <span className="result-value">
-                                        {result.visit.tenant?.unit_number} — Block {result.visit.tenant?.block}
+                                        {result.visit.tenant?.unit_number} —
+                                        Block {result.visit.tenant?.block}
                                     </span>
                                 </div>
                                 <div className="result-item">
-                                    <span className="result-label">Purpose</span>
-                                    <span className="result-value">{result.visit.purpose}</span>
+                                    <span className="result-label">
+                                        Purpose
+                                    </span>
+                                    <span className="result-value">
+                                        {result.visit.purpose}
+                                    </span>
                                 </div>
                                 <div className="result-item">
-                                    <span className="result-label">Expected In</span>
-                                    <span className="result-value">{result.visit.expected_time_in}</span>
+                                    <span className="result-label">
+                                        Expected In
+                                    </span>
+                                    <span className="result-value">
+                                        {result.visit.expected_time_in}
+                                    </span>
                                 </div>
                                 <div className="result-item">
-                                    <span className="result-label">Expected Out</span>
-                                    <span className="result-value">{result.visit.expected_time_out}</span>
+                                    <span className="result-label">
+                                        Expected Out
+                                    </span>
+                                    <span className="result-value">
+                                        {result.visit.expected_time_out}
+                                    </span>
                                 </div>
                             </div>
                         </div>
 
                         {/* Actions */}
                         <div className="d-flex gap-2 mt-4">
-                            {result.visit.status === 'pending' && (
+                            {result.visit.status === "pending" && (
                                 <button
                                     className="btn btn-success flex-fill"
-                                    onClick={() => handleCheckIn(result.visit.visit_id)}
+                                    onClick={() =>
+                                        handleCheckIn(result.visit.visit_id)
+                                    }
                                     disabled={actionLoading}
                                 >
-                                    {actionLoading ? 'Processing...' : '✅ Check In Visitor'}
+                                    {actionLoading
+                                        ? "Processing..."
+                                        : "✅ Check In Visitor"}
                                 </button>
                             )}
 
-                            {result.visit.status === 'checked-in' && (
+                            {result.visit.status === "checked-in" && (
                                 <>
                                     <div className="alert alert-success flex-fill mb-0">
-                                        ✅ Checked in at {formatTime(result.visit.check_in)}
+                                        ✅ Checked in at{" "}
+                                        {formatTime(result.visit.check_in)}
                                     </div>
                                     <button
                                         className="btn btn-secondary"
-                                        onClick={() => handleCheckOut(result.visit.visit_id)}
+                                        onClick={() =>
+                                            handleCheckOut(
+                                                result.visit.visit_id,
+                                            )
+                                        }
                                         disabled={actionLoading}
                                     >
-                                        {actionLoading ? 'Processing...' : '🚪 Check Out'}
+                                        {actionLoading
+                                            ? "Processing..."
+                                            : "🚪 Check Out"}
                                     </button>
                                 </>
                             )}
 
-                            {result.visit.status === 'checked-out' && (
+                            {result.visit.status === "checked-out" && (
                                 <div className="alert alert-secondary flex-fill mb-0">
-                                    🚪 Visitor checked out at {formatTime(result.visit.check_out)}
+                                    🚪 Visitor checked out at{" "}
+                                    {formatTime(result.visit.check_out)}
                                 </div>
                             )}
                         </div>
