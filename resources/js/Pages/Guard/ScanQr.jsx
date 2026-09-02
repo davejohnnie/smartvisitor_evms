@@ -75,7 +75,15 @@ export default function ScanQr() {
 
                     await html5Qr.start(
                         cameraId || { facingMode: "environment" },
-                        { fps: 10, qrbox: { width: 280, height: 280 } },
+                        {
+    fps: 10,
+    qrbox: { width: 250, height: 250 },
+    videoConstraints: {
+        facingMode: { ideal: "environment" },
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+    },
+},
                         onScanSuccess,
                         () => {},
                     );
@@ -83,7 +91,15 @@ export default function ScanQr() {
                     // Fall back to front-facing camera (PC/laptop)
                     await html5Qr.start(
                         { facingMode: "user" },
-                        { fps: 10, qrbox: { width: 280, height: 280 } },
+                        {
+    fps: 10,
+    qrbox: { width: 250, height: 250 },
+    videoConstraints: {
+        facingMode: { ideal: "user" },
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+    },
+},
                         onScanSuccess,
                         () => {},
                     );
