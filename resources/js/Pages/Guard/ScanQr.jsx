@@ -61,7 +61,7 @@ export default function ScanQr() {
                     html5QrRef.current = null;
                     setScanning(false);
                     setVerifying(true);
-                    await new Promise((resolve) => setTimeout(resolve, 700));
+                    await new Promise((resolve) => setTimeout(resolve, 1700));
                     await verifyToken(decodedText);
                     setVerifying(false);
                 };
@@ -160,7 +160,11 @@ export default function ScanQr() {
             setActionMsg({ type: "success", text: res.data.message });
             setResult((prev) => ({
                 ...prev,
-                visit: { ...prev.visit, status: "checked-in" },
+                visit: {
+                    ...prev.visit,
+                    status: "checked-in",
+                    check_in: new Date().toISOString(),
+                },
             }));
         } catch (err) {
             setActionMsg({

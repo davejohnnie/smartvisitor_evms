@@ -1,5 +1,8 @@
 import InputError from "@/Components/InputError";
 import { Head, useForm } from "@inertiajs/react";
+import { useState } from "react";
+const [showPassword, setShowPassword] = useState(false);
+const [showPasswordConfirm, setShowPasswordConfirm] = useState(false);
 
 export default function Register() {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -150,16 +153,36 @@ export default function Register() {
 
                         <div>
                             <label htmlFor="password">Password</label>
-                            <input
-                                id="password"
-                                type="password"
-                                value={data.password}
-                                autoComplete="new-password"
-                                onChange={(e) =>
-                                    setData("password", e.target.value)
-                                }
-                                required
-                            />
+                            <div style={{ position: "relative" }}>
+                                <input
+                                    id="password"
+                                    type={showPassword ? "text" : "password"}
+                                    value={data.password}
+                                    autoComplete="new-password"
+                                    onChange={(e) =>
+                                        setData("password", e.target.value)
+                                    }
+                                    required
+                                    style={{ paddingRight: "48px" }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword((v) => !v)}
+                                    style={{
+                                        position: "absolute",
+                                        right: "12px",
+                                        top: "50%",
+                                        transform: "translateY(-50%)",
+                                        background: "none",
+                                        border: "none",
+                                        cursor: "pointer",
+                                        fontSize: "0.85rem",
+                                    }}
+                                    tabIndex={-1}
+                                >
+                                    {showPassword ? "🙈 Hide" : "👁 Show"}
+                                </button>
+                            </div>
                             <InputError
                                 message={errors.password}
                                 className="mt-2"
@@ -170,19 +193,39 @@ export default function Register() {
                             <label htmlFor="password_confirmation">
                                 Confirm Password
                             </label>
-                            <input
-                                id="password_confirmation"
-                                type="password"
-                                value={data.password_confirmation}
-                                autoComplete="new-password"
-                                onChange={(e) =>
-                                    setData(
-                                        "password_confirmation",
-                                        e.target.value,
-                                    )
-                                }
-                                required
-                            />
+                            <div style={{ position: "relative" }}>
+                                <input
+                                    id="password_confirmation"
+                                    type={showPasswordConfirm ? "text" : "password"}
+                                    value={data.password_confirmation}
+                                    autoComplete="new-password"
+                                    onChange={(e) =>
+                                        setData(
+                                            "password_confirmation",
+                                            e.target.value,
+                                        )
+                                    }
+                                    required
+                                    style={{ paddingRight: "48px" }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPasswordConfirm((v) => !v)}
+                                    style={{
+                                        position: "absolute",
+                                        right: "12px",
+                                        top: "50%",
+                                        transform: "translateY(-50%)",
+                                        background: "none",
+                                        border: "none",
+                                        cursor: "pointer",
+                                        fontSize: "0.85rem",
+                                    }}
+                                    tabIndex={-1}
+                                >
+                                    {showPasswordConfirm ? "🙈 Hide" : "👁 Show"}
+                                </button>
+                            </div>
                             <InputError
                                 message={errors.password_confirmation}
                                 className="mt-2"

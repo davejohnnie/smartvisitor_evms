@@ -1,5 +1,7 @@
 import InputError from "@/Components/InputError";
 import { Head, useForm } from "@inertiajs/react";
+import { useState } from "react";
+const [showPassword, setShowPassword] = useState(false);
 
 export default function Login({ status }) {
     const { data, setData, post, processing, errors, reset } = useForm({
@@ -77,16 +79,36 @@ export default function Login({ status }) {
 
                         <div>
                             <label htmlFor="password">Password</label>
-                            <input
-                                id="password"
-                                type="password"
-                                value={data.password}
-                                autoComplete="current-password"
-                                onChange={(e) =>
-                                    setData("password", e.target.value)
-                                }
-                                required
-                            />
+                            <div style={{ position: "relative" }}>
+                                <input
+                                    id="password"
+                                    type={showPassword ? "text" : "password"}
+                                    value={data.password}
+                                    autoComplete="current-password"
+                                    onChange={(e) =>
+                                        setData("password", e.target.value)
+                                    }
+                                    required
+                                    style={{ paddingRight: "48px" }}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => setShowPassword((v) => !v)}
+                                    style={{
+                                        position: "absolute",
+                                        right: "12px",
+                                        top: "50%",
+                                        transform: "translateY(-50%)",
+                                        background: "none",
+                                        border: "none",
+                                        cursor: "pointer",
+                                        fontSize: "0.85rem",
+                                    }}
+                                    tabIndex={-1}
+                                >
+                                    {showPassword ? "🙈 Hide" : "👁 Show"}
+                                </button>
+                            </div>
                             <InputError
                                 message={errors.password}
                                 className="mt-2"
