@@ -12,6 +12,7 @@ export default function ScanQr() {
     const [actionLoading, setActionLoading] = useState(false);
     const [manualToken, setManualToken] = useState("");
     const [activeTab, setActiveTab] = useState("camera");
+    const [verifying, setVerifying] = useState(false);
     const html5QrRef = useRef(null);
 
     // Get XSRF token from cookie
@@ -59,7 +60,10 @@ export default function ScanQr() {
                     await html5Qr.stop();
                     html5QrRef.current = null;
                     setScanning(false);
+                    setVerifying(true);
+                    await new Promise((resolve) => setTimeout(resolve, 700));
                     await verifyToken(decodedText);
+                    setVerifying(false);
                 };
 
                 // Try to explicitly pick the rear camera via device enumeration,
@@ -76,14 +80,14 @@ export default function ScanQr() {
                     await html5Qr.start(
                         cameraId || { facingMode: "environment" },
                         {
-    fps: 10,
-    qrbox: { width: 250, height: 250 },
-    videoConstraints: {
-        facingMode: { ideal: "environment" },
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
-    },
-},
+                            fps: 10,
+                            qrbox: { width: 250, height: 250 },
+                            videoConstraints: {
+                                facingMode: { ideal: "environment" },
+                                width: { ideal: 1280 },
+                                height: { ideal: 720 },
+                            },
+                        },
                         onScanSuccess,
                         () => {},
                     );
@@ -92,14 +96,14 @@ export default function ScanQr() {
                     await html5Qr.start(
                         { facingMode: "user" },
                         {
-    fps: 10,
-    qrbox: { width: 250, height: 250 },
-    videoConstraints: {
-        facingMode: { ideal: "user" },
-        width: { ideal: 1280 },
-        height: { ideal: 720 },
-    },
-},
+                            fps: 10,
+                            qrbox: { width: 250, height: 250 },
+                            videoConstraints: {
+                                facingMode: { ideal: "user" },
+                                width: { ideal: 1280 },
+                                height: { ideal: 720 },
+                            },
+                        },
                         onScanSuccess,
                         () => {},
                     );
@@ -341,6 +345,13 @@ export default function ScanQr() {
                                 🔄 Verify Another
                             </button>
                         )}
+                    </div>
+                )}
+
+                {/* ── Verifying State ── */}
+                {verifying && (
+                    <div className="alert alert-info">
+                        🔎 Verifying visitor...
                     </div>
                 )}
 
